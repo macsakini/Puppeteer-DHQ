@@ -1,0 +1,46 @@
+name: BuildSpec File
+
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: eu-central-1
+
+      - name: Install Node 18
+        run: |
+          echo 'Installing dependencies'
+          echo 'Dependencies have finished installing'
+      - name: Build the Package
+        run: |
+          ls -l
+          echo 'Entered the build phase...'
+          zip -r deployment-package.zip .
+          ls -l
+          echo 'Deployment Package Created Successfully.'
+          echo 'Build succeeded'
+          
+      - name: Default Deploy
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_KEY }}
+          aws_region: eu-central-1
+          function_name: dhqS3DBUpdate
+          zip_file: deployment-package.zip
+      
+      
+
+
+
